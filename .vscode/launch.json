@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Edge",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Launch via NPM",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "debug"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Mocha Tests + Sync Strike",
+      "type": "node",
+      "request": "launch",
+      "program": "mocha",
+      "args": [
+        "-u", "tdd",
+        "--timeout", "999999",
+        "--colors",
+        "${workspaceFolder}/test"
+      ],
+      "internalConsoleOptions": "openOnSessionStart",
+      "skipFiles": ["<node_internals>/**"],
+      "preLaunchTask": "Test & Sync Strike"
+    },
+    {
+      "name": "Launch Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

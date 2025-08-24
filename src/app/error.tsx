@@ -1,7 +1,16 @@
-import TroubleshootingAIGuide from "@/components/TroubleshootingAIGuide";
+"use client";
 
-export default function ErrorPanel({ userId, workflow, lastAction, lastStatus, logs, error }) {
-  // Only show panel if there's an error
+import TroubleshootingAIGuide from "@/components/TroubleshootingAIGuide";
+import React from "react";
+
+export default function ErrorPanel({
+  userId,
+  workflow,
+  lastAction,
+  lastStatus,
+  logs,
+  error,
+}) {
   return (
     <div>
       {error && (
