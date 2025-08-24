@@ -1,12 +1,14 @@
-// Model for sector-specific knowledge notebook page
-
+// src/firestoreSchemas/NotebookPage.ts
 export type NotebookPage = {
   id: string;
-  sector: string;
+  sector: Sector;
   title: string;
   content: string;
-  sourceType: string; // "webscraper", "manual", "ssh", "mcp"
-  lastUpdated: Date;
+  sourceType: "webscraper" | "manual" | "ssh" | "mcp";
+  sourceUrl?: string;
   tags: string[];
-  aiClassification: string; // e.g. "legal", "design", "sales"
+  createdAt: number;
+  updatedAt: number;
+  relevance?: number;
+  checksum?: string; // for dedupe
 };

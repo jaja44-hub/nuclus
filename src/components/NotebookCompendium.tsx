@@ -1,27 +1,20 @@
-import React, { useState } from "react";
-import { NotebookPage } from "../firestoreSchemas/NotebookPage";
+// src/components/NotebookCompendium.tsx
+import React from "react";
+import { NotebookPage } from "@/firestoreSchemas/NotebookPage";
+import { Sector } from "@/firestoreSchemas/SectorSchemas";
 
-export default function NotebookCompendium({ sector, pages }: { sector: string, pages: NotebookPage[] }) {
-  const filteredPages = pages.filter(p => p.sector === sector);
-
+export default function NotebookCompendium({ sector, pages }: { sector: Sector; pages: NotebookPage[] }) {
+  const filtered = pages.filter(p => p.sector === sector);
   return (
-    <div className="bg-gray-100 rounded p-4 mb-4">
-      <h2 className="font-bold text-lg text-gray-800 mb-2">{sector.charAt(0).toUpperCase() + sector.slice(1)} Knowledge Compendium</h2>
-      {filteredPages.length === 0 ? (
-        <div className="text-gray-500">No notebook pages yet for this sector.</div>
-      ) : (
-        <ul>
-          {filteredPages.map(page => (
-            <li key={page.id} className="mb-2 border-b pb-2">
-              <div className="font-bold">{page.title}</div>
-              <div className="text-xs text-gray-600">AI Classified: {page.aiClassification}</div>
-              <div>{page.content.slice(0, 60)}...</div>
-              <div className="text-xs text-blue-600 mt-1">Tags: {page.tags.join(", ")}</div>
-              <div className="text-xs text-green-700 mt-1">Last updated: {page.lastUpdated.toLocaleString()}</div>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="space-y-3">
+      {filtered.map(p => (
+        <article key={p.id} className="border rounded p-3">
+          <h3 className="font-semibold">{p.title}</h3>
+          <p className="text-sm text-gray-600">{(p.content || "").slice(0, 200)}...</p>
+          <div className="text-xs mt-2">{p.tags.map(t => <span key={t} className="mr-2">#{t}</span>)}</div>
+        </article>
+      ))}
+      {filtered.length === 0 && <div className="text-sm text-gray-500">No pages yet for {sector}.</div>}
     </div>
   );
 }

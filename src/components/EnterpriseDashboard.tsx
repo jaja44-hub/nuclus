@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from "react";
-import SectorSelector from "./SectorSelector";
-import NotebookCompendium from "./NotebookCompendium";
-import { getNotebookPages } from "../backend/firestore/sectorFirestoreService";
-import { NotebookPage } from "../firestoreSchemas/NotebookPage";
+// src/components/EnterpriseDashboard.tsx
+import React, { useEffect, useState } from "react";
+import SectorSelector from "@/components/SectorSelector";
+import NotebookCompendium from "@/components/NotebookCompendium";
+import { getNotebookPages } from "@/backend/firestore/sectorFirestoreService";
+import { NotebookPage } from "@/firestoreSchemas/NotebookPage";
+import { Sector } from "@/firestoreSchemas/SectorSchemas";
 
 export default function EnterpriseDashboard() {
-  const [selectedSector, setSector] = useState("realestate");
+  const [sector, setSector] = useState<Sector>("realestate");
   const [pages, setPages] = useState<NotebookPage[]>([]);
-
   useEffect(() => {
-    // Load notebook pages for the selected sector from Firestore
-    getNotebookPages(selectedSector as any).then(setPages);
-  }, [selectedSector]);
-
+    getNotebookPages(sector).then(setPages).catch(() => setPages([]));
+  }, [sector]);
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <SectorSelector selectedSector={selectedSector} setSector={setSector} />
-      <NotebookCompendium sector={selectedSector} pages={pages} />
-    </div>
+    <section className="p-4 space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-xl font-bold">Enterprise Dashboard</h2>
+        <SectorSelector value={sector} setSector={setSector} />
+      </div>
+      <NotebookCompendium sector={sector} pages={pages} />
+    </section>
   );
 }
