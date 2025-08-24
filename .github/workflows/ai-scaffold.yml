@@ -1,0 +1,16 @@
+name: AI Scaffold & Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ai-scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Run Gemini CLI Scaffold
+        run: node scripts/gemini-scaffold.ts "Build a Next.js + Firebase dashboard with AI automation."
+      - name: Deploy to Firebase (optional)
+        run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}

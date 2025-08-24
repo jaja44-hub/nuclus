@@ -1,0 +1,17 @@
+project:
+  name: Nuclear Builder
+  mission: AI-powered developer dashboard
+  stack:
+    frontend: Next.js 14+, React 18+, TypeScript, Tailwind CSS, Shadcn/ui
+    backend: Firebase (Firestore, Hosting, Auth, Functions)
+    ai: Gemini API, LangChain, MCP
+  features:
+    - Secure key vault (AES-GCM, passphrase)
+    - Document vault (contextual docs)
+    - Project orchestrator (AI-driven)
+    - Platform integrations (GitHub, Firebase, Render, OpenNotebook, etc)
+    - Workflow automation (CI/CD, deploy, codegen)
+    - Beginner onboarding
+  deployment: Firebase Hosting, GitHub Actions, Render.com
+  security: Zero-trust, client-side encryption, audit trail
+  ui: Responsive, beginner-friendly, dark/light, drag-and-drop, tooltips
