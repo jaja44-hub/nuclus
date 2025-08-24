@@ -12,3 +12,14 @@ git pull --rebase origin main
 git push origin main
 
 echo "🚀 Strike complete — code tested, rebased, pushed."
+# --- Auto‑Open Web Preview ---
+if command -v code &>/dev/null && [[ -n "$CODESPACES" ]]; then
+    # In GitHub Codespaces: open the forwarded port in browser
+    PORT=$(npx --yes get-port-cli 3000 5173)
+    gp preview "http://localhost:$PORT"
+elif command -v xdg-open &>/dev/null; then
+    xdg-open "http://localhost:3000" >/dev/null 2>&1 &
+elif command -v open &>/dev/null; then
+    open "http://localhost:3000"
+fi
+# --- End Auto‑Open Web Preview ---
