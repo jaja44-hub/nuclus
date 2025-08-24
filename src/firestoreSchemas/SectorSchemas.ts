@@ -1,49 +1,38 @@
-// Firestore schemas for multi-sector enterprise use
+// src/firestoreSchemas/SectorSchemas.ts
+export type Sector = "realestate" | "construction" | "manufacturing" | "legal" | "consulting";
 
-export type Sector =
-  | "realestate"
-  | "construction"
-  | "manufacturing"
-  | "legal"
-  | "consulting";
-
-// Generic enterprise item, reusable across sectors
-export interface EnterpriseItem {
+export type EnterpriseItemBase = {
   id: string;
   sector: Sector;
   title: string;
-  description: string;
-  createdAt: Date;
-  updatedAt: Date;
-  customFields: Record<string, any>;
-  status: string;
-}
+  summary?: string;
+  ownerId: string;
+  createdAt: number;
+  updatedAt: number;
+  tags?: string[];
+};
 
-// Real estate listing example
-export interface RealEstateListing extends EnterpriseItem {
+export type RealEstateListing = EnterpriseItemBase & {
+  type: "listing";
   address: string;
   price: number;
-  agentId: string;
-}
+  status: "draft" | "active" | "sold";
+};
 
-// Construction project example
-export interface ConstructionProject extends EnterpriseItem {
-  client: string;
-  supervisorId: string;
-  startDate: Date;
-  endDate: Date;
-}
+export type ConstructionProject = EnterpriseItemBase & {
+  type: "project";
+  phase: "design" | "permit" | "build" | "handover";
+  budget?: number;
+};
 
-// Manufacturing work order example
-export interface ManufacturingOrder extends EnterpriseItem {
-  factory: string;
-  batchNumber: string;
-  quantity: number;
-}
+export type ManufacturingSpec = EnterpriseItemBase & {
+  type: "spec";
+  sku: string;
+  bomUrl?: string;
+};
 
-// Consulting case example
-export interface ConsultingCase extends EnterpriseItem {
-  client: string;
-  consultantId: string;
-  caseType: string;
-}
+export type EnterpriseItem =
+  | RealEstateListing
+  | ConstructionProject
+  | ManufacturingSpec
+  | EnterpriseItemBase;

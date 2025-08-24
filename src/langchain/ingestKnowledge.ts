@@ -1,38 +1,56 @@
-import { NotebookPage } from "../firestoreSchemas/NotebookPage";
+// src/langchain/ingestKnowledge.ts
+import { upsertNotebookPage } from "@/backend/firestore/sectorFirestoreService";
+import { NotebookPage } from "@/firestoreSchemas/NotebookPage";
+import { Sector } from "@/firestoreSchemas/SectorSchemas";
+// Placeholder imports for tools
+// import { scrapeUrl } from "@/ingestion/scraper";
+// import { sshFetch } from "@/ingestion/ssh";
+// import { mcpFetch } from "@/ai/mcp";
+import crypto from "crypto";
 
-// Simulated pipeline for knowledge ingestion and classification
-export async function ingestKnowledge(
-  sourceUrl: string,
-  sector: string,
-  tags: string[]
-): Promise<NotebookPage> {
-  // 1. Simulate scrape or fetch content (via SSH/MCP)
-  const content = await fakeFetchContent(sourceUrl);
-  // 2. Simulate classification with AI (LangChain)
-  const aiClassification = await fakeClassifyWithAI(content, sector);
-  // 3. Return NotebookPage object (would store in Firestore in real app)
-  return {
-    id: generateId(),
+async function fetchContent(sourceUrl: string, sourceType: NotebookPage["sourceType"]): Promise<string> {
+  // Plug real implementations here
+  if (sourceType === "webscraper") return `CONTENT_FROM:${sourceUrl}`;
+  if (sourceType === "ssh") return `SSH_DUMP:${sourceUrl}`;
+  if (sourceType === "mcp") return `MCP_RESULT:${sourceUrl}`;
+  return "";
+}
+
+function classifyAndTag(content: string, sector: Sector): { tags: string[]; relevance: number } {
+  // Minimal heuristic; replace with LangChain classifier
+  const base = content.toLowerCase();
+  const tags = [sector, base.includes("compliance") ? "compliance" : "general"];
+  const relevance = Math.min(1, base.length / 5000);
+  return { tags, relevance };
+}
+
+function checksum(str: string) {
+  return crypto.createHash("sha256").update(str).digest("hex");
+}
+
+export async function ingestKnowledge(params: {
+  sourceUrl: string;
+  sector: Sector;
+  sourceType: NotebookPage["sourceType"];
+  title?: string;
+}) {
+  const { sourceUrl, sector, sourceType, title } = params;
+  const content = await fetchContent(sourceUrl, sourceType);
+  const { tags, relevance } = classifyAndTag(content, sector);
+  const id = checksum(`${sector}:${sourceUrl}`);
+  const page: NotebookPage = {
+    id,
     sector,
-    title: extractTitle(content),
+    title: title ?? sourceUrl,
     content,
-    sourceType: "webscraper",
-    lastUpdated: new Date(),
+    sourceType,
+    sourceUrl,
     tags,
-    aiClassification,
+    relevance,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    checksum: id,
   };
-}
-
-// --- Simulated helpers for beginner-friendly demonstration ---
-async function fakeFetchContent(url: string) {
-  return `Fetched content from ${url}`;
-}
-async function fakeClassifyWithAI(content: string, sector: string) {
-  return `classified-${sector}`;
-}
-function extractTitle(content: string) {
-  return content.slice(0, 20) + "...";
-}
-function generateId() {
-  return Math.random().toString(36).slice(2, 10);
+  await upsertNotebookPage(sector, page);
+  return page;
 }

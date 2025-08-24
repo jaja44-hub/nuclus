@@ -1,8 +1,13 @@
-// Placeholder for Open Notebook Language Model integration
+// src/ai/openNotebook.ts
+// Adapter for Open Notebook LM (stub – replace with real API/tool calls)
+export type NotebookToolCall = { tool: string; args: Record<string, unknown> };
 
-export async function callNotebookTool(toolName: string, args: any) {
-  // Integrate with Open Notebook LM (offline/online)
-  // For now, just log
-  console.log(`Calling tool ${toolName} with args`, args);
-  return { status: "success", output: `Result from ${toolName}` };
+export async function callNotebookTool(call: NotebookToolCall) {
+  // TODO: integrate offline/online tool-calling
+  return { ok: true, result: `TOOL:${call.tool}`, args: call.args };
+}
+
+export async function syncNotebookPage(id: string, content: string) {
+  // TODO: push page content to Open Notebook backend
+  return { ok: true, id };
 }

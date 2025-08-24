@@ -1,26 +1,23 @@
+// src/components/SectorSelector.tsx
 import React from "react";
+import type { Sector } from "@/firestoreSchemas/SectorSchemas";
 
-const sectors = [
+const sectors: { key: Sector; label: string }[] = [
   { key: "realestate", label: "Real Estate" },
   { key: "construction", label: "Construction" },
   { key: "manufacturing", label: "Manufacturing" },
   { key: "legal", label: "Legal" },
-  { key: "consulting", label: "Consulting" }
+  { key: "consulting", label: "Consulting" },
 ];
 
-export default function SectorSelector({ selectedSector, setSector }) {
+export default function SectorSelector({ value, setSector }: { value: Sector; setSector: (s: Sector) => void }) {
   return (
-    <div className="mb-4">
-      <label className="block mb-2 font-bold text-gray-700">Choose your business sector:</label>
-      <select
-        value={selectedSector}
-        onChange={e => setSector(e.target.value)}
-        className="px-2 py-1 rounded border w-full"
-      >
-        {sectors.map(sec => (
-          <option key={sec.key} value={sec.key}>{sec.label}</option>
-        ))}
-      </select>
-    </div>
+    <select value={value} onChange={e => setSector(e.target.value as Sector)} className="px-2 py-1 rounded border">
+      {sectors.map(s => (
+        <option key={s.key} value={s.key}>
+          {s.label}
+        </option>
+      ))}
+    </select>
   );
 }
