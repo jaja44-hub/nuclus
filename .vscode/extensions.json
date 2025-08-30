@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "google.gemini-cli-vscode-ide-companion",
+    "sixth.sixth-ai",
+    "dbaeumer.vscode-eslint",
+    "google.geminicodeassist"
+  ]
+}

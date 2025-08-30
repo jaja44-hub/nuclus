@@ -2,6 +2,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+<<<<<<< HEAD
     function isAuthed() { return request.auth != null; }
     function isOwner(ownerId) { return isAuthed() && request.auth.uid == ownerId; }
 
@@ -24,6 +25,10 @@ service cloud.firestore {
     }
     match /deployment_logs/{doc} {
       allow read, create: if isAuthed();
+=======
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth.uid == userId;
+>>>>>>> c0f641d (🪓 Codex restoration: 147 changes swept and secured post-quota breach)
     }
   }
 }

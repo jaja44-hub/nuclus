@@ -2,9 +2,25 @@ import { useState } from "react";
 import { getWorkflowAdvice } from "@/ai/aiGuide";
 import VoiceGuide from "@/components/VoiceGuide";
 
-export default function BeginnerStepGuide({ workflow, userId, context, lastAction, lastStatus, logs }) {
+interface BeginnerStepGuideProps {
+  workflow: string;
+  userId: string;
+  context?: string;
+  lastAction?: string;
+  lastStatus?: string;
+  logs?: string[];
+}
+
+export default function BeginnerStepGuide({
+  workflow,
+  userId,
+  context,
+  lastAction,
+  lastStatus,
+  logs
+}: BeginnerStepGuideProps) {
   const [step, setStep] = useState(0);
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function fetchSteps() {
@@ -17,10 +33,11 @@ export default function BeginnerStepGuide({ workflow, userId, context, lastActio
       lastStatus,
       logs,
     });
-    // Split steps by numbered list for clarity
-    const splitSteps = (res.text || res)
-      .split(/\d+\.\s+/)
-      .filter(line => line.trim());
+    const adviceText = typeof res === "string" ? res : res.text;
+const splitSteps = adviceText
+  .split(/\d+\.\s+/)
+  .filter((line: string) => line.trim());
+
     setSteps(splitSteps);
     setStep(0);
     setLoading(false);

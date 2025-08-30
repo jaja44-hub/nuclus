@@ -1,0 +1,37 @@
+{
+  "name": "Nuclus Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js App",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "google.geminicodeassist",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "mhutchie.git-graph",
+        "Sixth.sixth-ai",
+        "google.gemini-cli-vscode-ide-companion",
+        "GitHub.copilot-chat"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  },
+  "postCreateCommand": "npm install"
+}

@@ -1,56 +1,53 @@
-// AES-GCM encryption/decryption for credentials vault
+import crypto from "crypto";
 
-export async function encryptCredential(secret: string, passphrase: string): Promise<string> {
-  const enc = new TextEncoder();
-  const keyMaterial = await window.crypto.subtle.importKey(
-    "raw", enc.encode(passphrase), "PBKDF2", false, ["deriveKey"]
-  );
-  const key = await window.crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt: enc.encode("nuclear-builder-salt"),
-      iterations: 100000,
-      hash: "SHA-256"
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt", "decrypt"]
-  );
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const ciphertext = await window.crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
-    key,
-    enc.encode(secret)
-  );
-  return JSON.stringify({ iv: Array.from(iv), data: Array.from(new Uint8Array(ciphertext)) });
+const ALGORITHM = "aes-256-gcm";
+const IV_LENGTH = 16;
+const SALT_LENGTH = 64;
+const KEY_LENGTH = 32;
+const AUTH_TAG_LENGTH = 16;
+
+// Derives a key from a passphrase using scrypt
+function getKey(passphrase: string, salt: Buffer): Buffer {
+  return crypto.scryptSync(passphrase, salt, KEY_LENGTH);
 }
 
-export async function decryptCredential(encrypted: string, passphrase: string): Promise<string> {
-  const enc = new TextEncoder();
-  const dec = new TextDecoder();
-  const parsed = JSON.parse(encrypted);
-  const keyMaterial = await window.crypto.subtle.importKey(
-    "raw", enc.encode(passphrase), "PBKDF2", false, ["deriveKey"]
+// Encrypts a text string using a passphrase
+export function encrypt(text: string, passphrase: string): string {
+  const salt = crypto.randomBytes(SALT_LENGTH);
+  const key = getKey(passphrase, salt);
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+
+  const encrypted = Buffer.concat([
+    cipher.update(text, "utf8"),
+    cipher.final(),
+  ]);
+  const tag = cipher.getAuthTag();
+
+  // Combine salt, iv, tag, and encrypted data into a single hex string for easy storage
+  return Buffer.concat([salt, iv, tag, encrypted]).toString("hex");
+}
+
+// Decrypts an encrypted hex string using a passphrase
+export function decrypt(encryptedHex: string, passphrase: string): string {
+  const data = Buffer.from(encryptedHex, "hex");
+
+  // Extract parts from the combined buffer
+  const salt = data.subarray(0, SALT_LENGTH);
+  const iv = data.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
+  const tag = data.subarray(
+    SALT_LENGTH + IV_LENGTH,
+    SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH
   );
-  const key = await window.crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt: enc.encode("nuclear-builder-salt"),
-      iterations: 100000,
-      hash: "SHA-256"
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt", "decrypt"]
-  );
-  const ciphertext = new Uint8Array(parsed.data);
-  const iv = new Uint8Array(parsed.iv);
-  const plaintext = await window.crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
-    key,
-    ciphertext
-  );
-  return dec.decode(plaintext);
+  const encrypted = data.subarray(SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH);
+
+  const key = getKey(passphrase, salt);
+  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+  decipher.setAuthTag(tag);
+
+  const decrypted = Buffer.concat([
+    decipher.update(encrypted),
+    decipher.final(),
+  ]);
+  return decrypted.toString("utf8");
 }
